@@ -1,9 +1,19 @@
+<<<<<<< HEAD
 ### IntelliJ IDEA ###
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
 ### Eclipse ###
+=======
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+>>>>>>> e6902c3 (Primer commit, con las dependencias del este proyecto)
 .apt_generated
 .classpath
 .factorypath
@@ -11,9 +21,18 @@ out/
 .settings
 .springBeans
 .sts4-cache
+<<<<<<< HEAD
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
+=======
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+>>>>>>> e6902c3 (Primer commit, con las dependencias del este proyecto)
 
 ### NetBeans ###
 /nbproject/private/
@@ -21,6 +40,7 @@ bin/
 /dist/
 /nbdist/
 /.nb-gradle/
+<<<<<<< HEAD
 
 ### VS Code ###
 .vscode/
@@ -32,3 +52,11 @@ parqueadero.iml
 
 .idea/
 
+=======
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+>>>>>>> e6902c3 (Primer commit, con las dependencias del este proyecto)
