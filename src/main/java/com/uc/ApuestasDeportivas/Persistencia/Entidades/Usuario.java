@@ -24,4 +24,21 @@ public class Usuario {
     @Column(name = "usu_contrasena")
     public String contrasena;
 
+    // Getters y Setters
+    public String getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(String usuario) {
+        this.usuario = usuario;
+    }
+
+    public String getContrasena() {
+        return contrasena;
+    }
+
+    public void setContrasena(String contrasena) {
+        this.contrasena = contrasena;
+    }
+
 }
