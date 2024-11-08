@@ -7,11 +7,12 @@
 </head>
 <body>
 <div class="container mt-5">
-    <h2 class="text-center">Bienvenido a la Gestión de Apuestas</h2>
-    <p class="text-center">Saldo actual: <strong th:text="${saldo}">0.0</strong> COP</p>
-    <div class="list-group">
+    <h1>Bienvenido a la Gestión de Apuestas</h1>
+    <p>Saldo Actual: $<span th:text="${saldo}">0.0</span></p>
+
+    <div class="list-group mt-3">
         <a th:href="@{/apuestas}" class="list-group-item list-group-item-action">Realizar Apuestas</a>
-        <a th:href="@{/historial}" class="list-group-item list-group-item-action">Historial de Apuestas</a>
+        <a th:href="@{/historialTransacciones}" class="list-group-item list-group-item-action">Ver Historial de Transacciones</a>
         <a th:href="@{/eventos}" class="list-group-item list-group-item-action">Ver Eventos Deportivos</a>
         <a th:href="@{/ingresoSaldo}" class="list-group-item list-group-item-action">Ingresar Saldo</a>
     </div>
