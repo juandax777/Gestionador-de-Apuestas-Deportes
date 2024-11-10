@@ -5,7 +5,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,8 +21,9 @@ public class EventoDeportivo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idEvento;
 
-    private String nombre;
-    private Date fecha;
-    private String equipoParticipante;
+    private String liga;
+    private String equipo1;
+    private String equipo2;
+    private String fecha;
     private String resultado;
 }
