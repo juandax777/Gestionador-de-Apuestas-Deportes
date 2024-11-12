@@ -10,7 +10,8 @@
     <p th:text="'Saldo Actual: $' + ${saldo}"></p>
     <ul class="list-group">
         <li class="list-group-item" th:each="liga : ${ligas}">
-            <a th:href="@{/eventos/liga(liga=${liga})}" th:text="${liga}"></a>
+            <!-- Redirige al controlador de partidos -->
+            <a th:href="@{/partidos/liga(liga=${liga})}" th:text="${liga}"></a>
         </li>
     </ul>
     <a th:href="@{/paginaPrincipal}" class="btn btn-secondary mt-3">Volver al Inicio</a>
