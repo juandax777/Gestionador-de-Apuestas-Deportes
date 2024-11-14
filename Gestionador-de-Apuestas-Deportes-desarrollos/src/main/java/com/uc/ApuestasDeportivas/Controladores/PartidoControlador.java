@@ -21,6 +21,6 @@ public class PartidoControlador {
         List<List<Partido>> jornadas = partidoServicio.generarPartidosPorJornadas(liga);
         model.addAttribute("liga", liga);
         model.addAttribute("jornadas", jornadas);
-        return "partidosPorLiga"; // Asegúrate de que el nombre del archivo HTML es correcto
+        return "partidosPorLiga";
     }
 }

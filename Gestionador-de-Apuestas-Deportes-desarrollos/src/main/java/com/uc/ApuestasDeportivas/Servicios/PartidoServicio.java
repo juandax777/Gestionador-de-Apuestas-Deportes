@@ -25,48 +25,54 @@ public class PartidoServicio {
 
     public List<List<Partido>> generarPartidosPorJornadas(String liga) {
         List<Equipo> equipos = equipoRepositorio.findByLiga(liga);
-        int numeroDeJornadas = equipos.size() - 1;  // Total de jornadas: n-1 para n equipos
+
+        if (equipos.size() < 2) {
+            throw new IllegalArgumentException("La liga debe tener al menos dos equipos.");
+        }
+
+        int numeroDeJornadas = equipos.size() - 1; // Total de jornadas: n-1 para n equipos
         int partidosPorJornada = equipos.size() / 2;
-        Random random = new Random();
 
         List<List<Partido>> todasLasJornadas = new ArrayList<>();
         Set<String> enfrentamientosPrevios = new HashSet<>();
 
-        // Rotar la lista de equipos para cada jornada para asegurar todos contra todos
-        for (int j = 0; j < numeroDeJornadas; j++) {
+        // Crear una lista mutable para rotar equipos sin afectar la original
+        List<Equipo> equiposRotados = new ArrayList<>(equipos);
+
+        for (int jornada = 0; jornada < numeroDeJornadas; jornada++) {
             List<Partido> jornadaActual = new ArrayList<>();
-            Collections.rotate(equipos, 1);  // Rotar los equipos para la jornada
 
             for (int i = 0; i < partidosPorJornada; i++) {
-                int indiceLocal = i;
-                int indiceVisitante = equipos.size() - 1 - i;
-
-                Equipo local = equipos.get(indiceLocal);
-                Equipo visitante = equipos.get(indiceVisitante);
+                Equipo local = equiposRotados.get(i);
+                Equipo visitante = equiposRotados.get(equiposRotados.size() - 1 - i);
 
                 String enfrentamiento = local.getNombre() + " vs " + visitante.getNombre();
                 String enfrentamientoInverso = visitante.getNombre() + " vs " + local.getNombre();
 
-                if (!enfrentamientosPrevios.contains(enfrentamiento) && !enfrentamientosPrevios.contains(enfrentamientoInverso) && local != visitante) {
+                // Verificar que el enfrentamiento no se haya generado previamente
+                if (!enfrentamientosPrevios.contains(enfrentamiento) && !enfrentamientosPrevios.contains(enfrentamientoInverso)) {
                     enfrentamientosPrevios.add(enfrentamiento);
 
-                    local.setCuota(1.00 + (5.00 - 1.00) * random.nextDouble());
-                    visitante.setCuota(1.00 + (5.00 - 1.00) * random.nextDouble());
+                    Random random = new Random();
+                    local.setCuota(Math.round((1.00 + (5.20 - 1.00) * random.nextDouble()) * 100.0) / 100.0);
+                    visitante.setCuota(Math.round((1.00 + (5.20 - 1.00) * random.nextDouble()) * 100.0) / 100.0);
 
                     Partido partido = new Partido(null, local, visitante, "Fecha programada", "");
                     jornadaActual.add(partido);
                 }
             }
-            todasLasJornadas.add(jornadaActual);
+
+            // Agregar la jornada solo si tiene partidos
+            if (!jornadaActual.isEmpty()) {
+                todasLasJornadas.add(jornadaActual);
+            }
+
+            // Rotar equipos para la próxima jornada
+            Collections.rotate(equiposRotados.subList(1, equiposRotados.size()), 1);
         }
 
-        // Guardar todos los partidos generados en la base de datos
-        todasLasJornadas.forEach(jornada -> jornada.forEach(partido -> {
-            equipoRepositorio.save(partido.getEquipoLocal());
-            equipoRepositorio.save(partido.getEquipoVisitante());
-            partidoRepositorio.save(partido);
-        }));
-
+        // Persistir partidos en la base de datos
+        todasLasJornadas.forEach(jornada -> jornada.forEach(partidoRepositorio::save));
         return todasLasJornadas;
     }
 }
