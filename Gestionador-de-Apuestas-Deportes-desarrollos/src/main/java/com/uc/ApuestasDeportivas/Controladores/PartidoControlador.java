@@ -18,9 +18,9 @@ public class PartidoControlador {
 
     @GetMapping("/partidos/liga")
     public String verPartidosPorLiga(@RequestParam("liga") String liga, Model model) {
-        List<Partido> partidos = partidoServicio.generarPartidos(liga);
+        List<List<Partido>> jornadas = partidoServicio.generarPartidosPorJornadas(liga);
         model.addAttribute("liga", liga);
-        model.addAttribute("partidos", partidos);
-        return "partidosPorLiga"; // Nombre del HTML
+        model.addAttribute("jornadas", jornadas);
+        return "partidosPorLiga"; // Asegúrate de que el nombre del archivo HTML es correcto
     }
 }
