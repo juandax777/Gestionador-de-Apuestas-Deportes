@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Partidos de la Liga</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .btn-cuota {
+            background-color: blue;
+            color: white;
+        }
+
+        .btn-cuota.seleccionado {
+            background-color: yellow;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <h2 th:text="'Partidos de la Liga: ' + ${liga}"></h2>
+
+    <div class="accordion" id="jornadasAccordion">
+        <div th:each="jornada, jornadaStat : ${jornadas}">
+            <div class="accordion-item">
+                <h2 class="accordion-header" th:id="'heading' + ${jornadaStat.index}">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            th:data-bs-target="'#collapse' + ${jornadaStat.index}" aria-expanded="false"
+                            th:aria-controls="'collapse' + ${jornadaStat.index}">
+                        <span th:text="'Jornada ' + (${jornadaStat.index} + 1)"></span>
+                    </button>
+                </h2>
+                <div th:id="'collapse' + ${jornadaStat.index}" class="accordion-collapse collapse"
+                     th:aria-labelledby="'heading' + ${jornadaStat.index}" data-bs-parent="#jornadasAccordion">
+                    <div class="accordion-body">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>Equipo Local</th>
+                                <th>Cuota Local</th>
+                                <th>Equipo Visitante</th>
+                                <th>Cuota Visitante</th>
+                                <th>Fecha</th>
+                                <th>Resultado</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="partido : ${jornada}">
+                                <td th:text="${partido.equipoLocal.nombre}"></td>
+                                <td><button class="btn btn-primary btn-cuota" onclick="this.classList.toggle('seleccionado')" th:text="${#numbers.formatDecimal(partido.equipoLocal.cuota, 1, 2)}"></button></td>
+                                <td th:text="${partido.equipoVisitante.nombre}"></td>
+                                <td><button class="btn btn-primary btn-cuota" onclick="this.classList.toggle('seleccionado')" th:text="${#numbers.formatDecimal(partido.equipoVisitante.cuota, 1, 2)}"></button></td>
+                                <td th:text="${partido.fecha}"></td>
+                                <td th:text="${partido.resultado}"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a th:href="@{/eventos}" class="btn btn-secondary">Volver a Ligas</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
