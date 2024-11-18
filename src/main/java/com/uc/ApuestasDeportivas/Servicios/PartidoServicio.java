@@ -7,12 +7,8 @@ import com.uc.ApuestasDeportivas.Persistencia.Repositorios.PartidoRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.HashSet;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class PartidoServicio {
@@ -23,26 +19,57 @@ public class PartidoServicio {
     @Autowired
     private PartidoRepositorio partidoRepositorio;
 
+    /**
+     * Genera partidos por jornadas para una liga específica.
+     * Si ya existen partidos, los recupera y agrupa correctamente.
+     * Si no existen, los genera, los guarda y los devuelve.
+     *
+     * @param liga Nombre de la liga.
+     * @return Lista de listas, donde cada lista interna representa una jornada.
+     */
     public List<List<Partido>> generarPartidosPorJornadas(String liga) {
-        List<Equipo> equipos = equipoRepositorio.findByLiga(liga);
+        // Verificar si ya existen partidos para esta liga
+        List<Partido> partidosExistentes = partidoRepositorio.findByEquipoLocalLiga(liga);
+        if (!partidosExistentes.isEmpty()) {
+            // Si ya existen partidos, agruparlos por jornadas y devolverlos
+            return agruparPorJornadas(partidosExistentes);
+        }
 
+        // Si no existen partidos, generarlos
+        List<Equipo> equipos = equipoRepositorio.findByLiga(liga);
         if (equipos.size() < 2) {
             throw new IllegalArgumentException("La liga debe tener al menos dos equipos.");
         }
 
-        int numeroDeJornadas = equipos.size() - 1; // Total de jornadas: n-1 para n equipos
-        int partidosPorJornada = equipos.size() / 2;
+        int numeroDeJornadas;
+        int partidosPorJornada;
+
+        // Configuración específica según la liga
+        switch (liga) {
+            case "Liga Escocesa":
+                numeroDeJornadas = 11;
+                partidosPorJornada = 9;
+                break;
+            case "Eliminatorias Sudamericanas":
+                numeroDeJornadas = 9;
+                partidosPorJornada = 5;
+                break;
+            case "Liga Ecuatoriana":
+                numeroDeJornadas = 15;
+                partidosPorJornada = 8;
+                break;
+            default:
+                throw new IllegalArgumentException("Liga no reconocida: " + liga);
+        }
 
         List<List<Partido>> todasLasJornadas = new ArrayList<>();
         Set<String> enfrentamientosPrevios = new HashSet<>();
-
-        // Crear una lista mutable para rotar equipos sin afectar la original
         List<Equipo> equiposRotados = new ArrayList<>(equipos);
-
         Random random = new Random();
 
         for (int jornada = 0; jornada < numeroDeJornadas; jornada++) {
             List<Partido> jornadaActual = new ArrayList<>();
+            String fechaJornada = "Jornada " + (jornada + 1); // Fecha o identificador único para la jornada
 
             for (int i = 0; i < partidosPorJornada; i++) {
                 Equipo local = equiposRotados.get(i);
@@ -59,23 +86,32 @@ public class PartidoServicio {
                     visitante.setCuota(Math.round((1.00 + (5.20 - 1.00) * random.nextDouble()) * 100.0) / 100.0);
                     Double cuotaEmpate = Math.round((1.50 + (3.50 - 1.50) * random.nextDouble()) * 100.0) / 100.0;
 
-                    Partido partido = new Partido(null, local, visitante, "Fecha programada", "", cuotaEmpate);
+                    Partido partido = new Partido(null, local, visitante, fechaJornada, "", cuotaEmpate);
                     jornadaActual.add(partido);
                 }
             }
 
-            // Agregar la jornada solo si tiene partidos
             if (!jornadaActual.isEmpty()) {
                 todasLasJornadas.add(jornadaActual);
             }
 
-            // Rotar equipos para la próxima jornada
             Collections.rotate(equiposRotados.subList(1, equiposRotados.size()), 1);
         }
 
-        // Persistir partidos en la base de datos
+        // Persistir los partidos en la base de datos
         todasLasJornadas.forEach(partidoRepositorio::saveAll);
         return todasLasJornadas;
     }
 
+    /**
+     * Agrupa partidos en jornadas según su fecha (identificador de jornada).
+     *
+     * @param partidos Lista de partidos a agrupar.
+     * @return Lista de listas de partidos agrupados por jornadas.
+     */
+    private List<List<Partido>> agruparPorJornadas(List<Partido> partidos) {
+        Map<String, List<Partido>> partidosAgrupados = partidos.stream()
+                .collect(Collectors.groupingBy(Partido::getFecha)); // Agrupa por la "fecha" de la jornada
+        return new ArrayList<>(partidosAgrupados.values());
+    }
 }
