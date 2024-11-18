@@ -74,7 +74,7 @@ public class PartidoServicio {
         }
 
         // Persistir partidos en la base de datos
-        todasLasJornadas.forEach(jornada -> jornada.forEach(partidoRepositorio::save));
+        todasLasJornadas.forEach(partidoRepositorio::saveAll);
         return todasLasJornadas;
     }
 
