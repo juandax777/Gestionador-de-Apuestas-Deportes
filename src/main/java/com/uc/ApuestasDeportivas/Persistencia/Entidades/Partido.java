@@ -27,4 +27,6 @@ public class Partido {
 
     private String fecha; // Fecha del partido
     private String resultado; // Resultado (vacío por ahora)
+
+    private Double cuotaEmpate; // Nueva cuota para empate
 }

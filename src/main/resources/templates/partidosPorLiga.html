@@ -37,6 +37,7 @@
                             <tr>
                                 <th>Equipo Local</th>
                                 <th>Cuota Local</th>
+                                <th>Empate</th>
                                 <th>Equipo Visitante</th>
                                 <th>Cuota Visitante</th>
                                 <th>Fecha</th>
@@ -46,9 +47,22 @@
                             <tbody>
                             <tr th:each="partido : ${jornada}">
                                 <td th:text="${partido.equipoLocal.nombre}"></td>
-                                <td><button class="btn btn-primary btn-cuota" onclick="this.classList.toggle('seleccionado')" th:text="${#numbers.formatDecimal(partido.equipoLocal.cuota, 1, 2)}"></button></td>
+                                <td>
+                                    <button class="btn btn-primary btn-cuota" onclick="seleccionarUnico(this)"
+                                            th:text="${#numbers.formatDecimal(partido.equipoLocal.cuota, 1, 2)}">
+                                    </button>
+                                </td>
+                                <td>
+                                    <button class="btn btn-primary btn-cuota" onclick="seleccionarUnico(this)"
+                                            th:text="${#numbers.formatDecimal(partido.cuotaEmpate, 1, 2)}">
+                                    </button>
+                                </td>
                                 <td th:text="${partido.equipoVisitante.nombre}"></td>
-                                <td><button class="btn btn-primary btn-cuota" onclick="this.classList.toggle('seleccionado')" th:text="${#numbers.formatDecimal(partido.equipoVisitante.cuota, 1, 2)}"></button></td>
+                                <td>
+                                    <button class="btn btn-primary btn-cuota" onclick="seleccionarUnico(this)"
+                                            th:text="${#numbers.formatDecimal(partido.equipoVisitante.cuota, 1, 2)}">
+                                    </button>
+                                </td>
                                 <td th:text="${partido.fecha}"></td>
                                 <td th:text="${partido.resultado}"></td>
                             </tr>
@@ -64,5 +78,17 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function seleccionarUnico(button) {
+        // Encuentra el tr más cercano para limitar la selección a un partido
+        const fila = button.closest('tr');
+
+        // Desactiva la clase 'seleccionado' de todos los botones de la fila
+        fila.querySelectorAll('.btn-cuota').forEach(boton => boton.classList.remove('seleccionado'));
+
+        // Agrega la clase 'seleccionado' al botón actual
+        button.classList.add('seleccionado');
+    }
+</script>
 </body>
 </html>

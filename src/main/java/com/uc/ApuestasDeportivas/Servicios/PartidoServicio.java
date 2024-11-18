@@ -39,6 +39,8 @@ public class PartidoServicio {
         // Crear una lista mutable para rotar equipos sin afectar la original
         List<Equipo> equiposRotados = new ArrayList<>(equipos);
 
+        Random random = new Random();
+
         for (int jornada = 0; jornada < numeroDeJornadas; jornada++) {
             List<Partido> jornadaActual = new ArrayList<>();
 
@@ -53,11 +55,11 @@ public class PartidoServicio {
                 if (!enfrentamientosPrevios.contains(enfrentamiento) && !enfrentamientosPrevios.contains(enfrentamientoInverso)) {
                     enfrentamientosPrevios.add(enfrentamiento);
 
-                    Random random = new Random();
                     local.setCuota(Math.round((1.00 + (5.20 - 1.00) * random.nextDouble()) * 100.0) / 100.0);
                     visitante.setCuota(Math.round((1.00 + (5.20 - 1.00) * random.nextDouble()) * 100.0) / 100.0);
+                    Double cuotaEmpate = Math.round((1.50 + (3.50 - 1.50) * random.nextDouble()) * 100.0) / 100.0;
 
-                    Partido partido = new Partido(null, local, visitante, "Fecha programada", "");
+                    Partido partido = new Partido(null, local, visitante, "Fecha programada", "", cuotaEmpate);
                     jornadaActual.add(partido);
                 }
             }
@@ -75,4 +77,5 @@ public class PartidoServicio {
         todasLasJornadas.forEach(jornada -> jornada.forEach(partidoRepositorio::save));
         return todasLasJornadas;
     }
+
 }
