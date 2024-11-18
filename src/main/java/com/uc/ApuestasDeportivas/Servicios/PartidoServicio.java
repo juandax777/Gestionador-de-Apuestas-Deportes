@@ -19,14 +19,7 @@ public class PartidoServicio {
     @Autowired
     private PartidoRepositorio partidoRepositorio;
 
-    /**
-     * Genera partidos por jornadas para una liga específica.
-     * Si ya existen partidos, los recupera y agrupa correctamente.
-     * Si no existen, los genera, los guarda y los devuelve.
-     *
-     * @param liga Nombre de la liga.
-     * @return Lista de listas, donde cada lista interna representa una jornada.
-     */
+
     public List<List<Partido>> generarPartidosPorJornadas(String liga) {
         // Verificar si ya existen partidos para esta liga
         List<Partido> partidosExistentes = partidoRepositorio.findByEquipoLocalLiga(liga);
@@ -103,12 +96,7 @@ public class PartidoServicio {
         return todasLasJornadas;
     }
 
-    /**
-     * Agrupa partidos en jornadas según su fecha (identificador de jornada).
-     *
-     * @param partidos Lista de partidos a agrupar.
-     * @return Lista de listas de partidos agrupados por jornadas.
-     */
+
     private List<List<Partido>> agruparPorJornadas(List<Partido> partidos) {
         Map<String, List<Partido>> partidosAgrupados = partidos.stream()
                 .collect(Collectors.groupingBy(Partido::getFecha)); // Agrupa por la "fecha" de la jornada
