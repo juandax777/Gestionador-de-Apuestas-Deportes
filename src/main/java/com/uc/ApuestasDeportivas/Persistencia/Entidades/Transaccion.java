@@ -5,29 +5,26 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import java.time.LocalDateTime;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Setter
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "transaccion")
 public class Transaccion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_transaccion")
     private Long idTransaccion;
 
-    @Column(name = "fecha")
     private LocalDateTime fecha;
 
-    @Column(name = "monto")
     private double monto;
 
-    @Column(name = "tipo")
-    private String tipo;
+    private String tipo; // Puede ser "Ingreso", "Apuesta", "Cancelación", etc.
 
     @ManyToOne
     @JoinColumn(name = "id_usuario", nullable = false)
