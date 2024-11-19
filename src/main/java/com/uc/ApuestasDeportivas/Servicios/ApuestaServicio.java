@@ -17,7 +17,15 @@ public class ApuestaServicio {
         return apuestaRepositorio.findAll();
     }
 
-    public Apuesta registrarApuesta(Apuesta apuesta) {
-        return apuestaRepositorio.save(apuesta);
+    public void registrarApuesta(Apuesta apuesta) {
+        apuestaRepositorio.save(apuesta);
+    }
+
+    public Apuesta obtenerPorId(Long id) {
+        return apuestaRepositorio.findById(id).orElse(null);
+    }
+
+    public void actualizarApuesta(Apuesta apuesta) {
+        apuestaRepositorio.save(apuesta);
     }
 }

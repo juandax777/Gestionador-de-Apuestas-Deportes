@@ -1,10 +1,6 @@
 package com.uc.ApuestasDeportivas.Persistencia.Entidades;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,8 +18,15 @@ public class Apuesta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idApuesta;
 
-    private double monto;
-    private String equipoSeleccionado;
-    private String estado;
-    private double cuota;
+    private double montoApostado;
+
+    @Column(name = "tipo_cuota")
+    private String tipoCuota; // Local, Empate, Visitante
+
+    private double cuotaSeleccionada;
+
+    private String equipoLocal;
+    private String equipoVisitante;
+
+    private String estado; // Pendiente, Ganada, Perdida
 }
