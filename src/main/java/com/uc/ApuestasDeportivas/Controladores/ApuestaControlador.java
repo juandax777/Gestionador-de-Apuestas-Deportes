@@ -49,7 +49,7 @@ public class ApuestaControlador {
                                    @RequestParam("liga") String liga,
                                    Model model) {
         // Simular saldo (para pruebas)
-        double saldo = 1000.00; // Cambiar esto para que sea dinámico (por ejemplo, obtenido de la base de datos)
+        double saldo = 100000.00; // Cambiar esto para que sea dinámico (por ejemplo, obtenido de la base de datos)
 
         if (saldo < montoApostado) {
             // Si el saldo es insuficiente, se devuelve al resumen con un mensaje de error
