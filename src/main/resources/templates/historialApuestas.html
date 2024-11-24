@@ -2,6 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Historial de Apuestas</title>
+    <div th:if="${mensaje}" class="alert alert-success">
+        <span th:text="${mensaje}"></span>
+    </div>
+    <div th:if="${error}" class="alert alert-danger">
+        <span th:text="${error}"></span>
+    </div>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
@@ -30,6 +36,7 @@
             <td>
                 <form th:action="@{/cancelarApuesta}" method="post" th:if="${apuesta.estado == 'Pendiente'}">
                     <input type="hidden" th:value="${apuesta.idApuesta}" name="idApuesta"/>
+                    <input type="hidden" th:value="${usuario}" name="usuario"/>
                     <button type="submit" class="btn btn-danger">Cancelar</button>
                 </form>
             </td>

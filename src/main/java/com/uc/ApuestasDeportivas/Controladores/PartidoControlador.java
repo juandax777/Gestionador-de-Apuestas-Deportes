@@ -17,7 +17,9 @@ public class PartidoControlador {
     private PartidoServicio partidoServicio;
 
     @GetMapping("/partidos/liga")
-    public String verPartidosPorLiga(@RequestParam(value = "liga", required = false) String liga, Model model) {
+    public String verPartidosPorLiga(@RequestParam("liga") String liga,
+                                     @RequestParam("usuario") String nombreUsuario,
+                                     Model model) {
         if (liga == null || liga.isBlank()) {
             model.addAttribute("error", "Liga no especificada.");
             return "error";
@@ -26,6 +28,8 @@ public class PartidoControlador {
         List<List<Partido>> jornadas = partidoServicio.generarPartidosPorJornadas(liga);
         model.addAttribute("liga", liga);
         model.addAttribute("jornadas", jornadas);
+        model.addAttribute("usuario", nombreUsuario);
         return "partidosPorLiga";
     }
+
 }

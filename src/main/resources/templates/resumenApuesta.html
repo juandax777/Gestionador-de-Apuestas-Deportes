@@ -19,13 +19,17 @@
             <p><strong>Equipo Visitante:</strong> <span th:text="${equipoVisitante}"></span></p>
             <p><strong>Cuota Seleccionada:</strong> <span th:text="${cuotaSeleccionada}"></span></p>
             <p><strong>Tipo de Cuota:</strong> <span th:text="${tipoCuota}"></span></p>
+            <p><strong>Saldo Disponible:</strong> $<span th:text="${saldo}">0.0</span></p>
+
 
             <form th:action="@{/confirmarApuesta}" method="post">
                 <input type="hidden" th:value="${equipoLocal}" name="equipoLocal"/>
+                <input type="hidden" name="usuario" th:value="${usuario}"/>
                 <input type="hidden" th:value="${equipoVisitante}" name="equipoVisitante"/>
                 <input type="hidden" th:value="${cuotaSeleccionada}" name="cuotaSeleccionada"/>
                 <input type="hidden" th:value="${tipoCuota}" name="tipoCuota"/>
                 <input type="hidden" th:value="${liga}" name="liga"/>
+
                 <div class="mb-3">
                     <label for="montoApostado" class="form-label">Monto a Apostar</label>
                     <input type="number" id="montoApostado" name="montoApostado" class="form-control" required min="0">
@@ -34,8 +38,33 @@
             </form>
         </div>
     </div>
-
-    <a th:href="@{/partidos/liga(liga=${liga})}" class="btn btn-secondary mt-3">Volver</a>
+    <div class="mb-3">
+        <label for="posiblesGanancias" class="form-label">Posibles Ganancias</label>
+        <input type="text" id="posiblesGanancias" name="posiblesGanancias" class="form-control" readonly>
+    </div>
+    <!-- Mostrar mensaje de error si existe -->
+    <div class="alert alert-danger" th:if="${error}">
+        <span th:text="${error}"></span>
+    </div>
+    <!-- Volver a la página de la liga -->
+    <a th:href="@{/partidos/liga(liga=${liga},usuario=${usuario})}" class="btn btn-secondary mt-3">Volver</a>
 </div>
+
+<script th:inline="javascript">
+    var montoApostadoInput = document.getElementById('montoApostado');
+    var cuotaSeleccionada = /*[[${cuotaSeleccionada}]]*/ 0;
+
+    montoApostadoInput.addEventListener('input', function () {
+        var montoApostado = parseFloat(this.value);
+        if (!isNaN(montoApostado) && !isNaN(cuotaSeleccionada)) {
+            var posiblesGanancias = montoApostado * cuotaSeleccionada;
+            document.getElementById('posiblesGanancias').value = posiblesGanancias.toFixed(2);
+        } else {
+            document.getElementById('posiblesGanancias').value = '';
+        }
+    });
+</script>
+
 </body>
 </html>
+

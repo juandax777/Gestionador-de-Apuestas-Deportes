@@ -1,13 +1,16 @@
 package com.uc.ApuestasDeportivas.Controladores;
 
 import com.uc.ApuestasDeportivas.Persistencia.Entidades.Apuesta;
+import com.uc.ApuestasDeportivas.Persistencia.Entidades.Usuario;
 import com.uc.ApuestasDeportivas.Servicios.ApuestaServicio;
+import com.uc.ApuestasDeportivas.Servicios.UsuarioServicios;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -16,13 +19,19 @@ import java.util.List;
 public class ApuestaControlador {
 
     private final ApuestaServicio apuestaServicio;
+    private final UsuarioServicios usuarioServicios;
 
     @GetMapping("/apuestas")
-    public String listarApuestas(Model model) {
-        List<Apuesta> apuestas = apuestaServicio.listarTodas();
+    public String listarApuestas(@RequestParam("usuario") String nombreUsuario, Model model) {
+        Usuario usuario = usuarioServicios.obtenerUsuarioPorNombre(nombreUsuario);
+        List<Apuesta> apuestas = apuestaServicio.listarPorUsuario(usuario);
         model.addAttribute("apuestas", apuestas);
+        model.addAttribute("usuario", nombreUsuario);
         return "historialApuestas"; // Vista de historial de apuestas
     }
+
+
+
 
     @PostMapping("/resumenApuesta")
     public String mostrarResumen(@RequestParam("tipoCuota") String tipoCuota,
@@ -30,15 +39,21 @@ public class ApuestaControlador {
                                  @RequestParam("equipoLocal") String equipoLocal,
                                  @RequestParam("equipoVisitante") String equipoVisitante,
                                  @RequestParam("liga") String liga,
+                                 @RequestParam("usuario") String nombreUsuario,
                                  Model model) {
-        // Pasar los datos al modelo para mostrarlos en la vista
+        // Obtener el saldo del usuario
+        double saldo = usuarioServicios.obtenerSaldo(nombreUsuario);
+        model.addAttribute("saldo", saldo);
+        // Pasar los datos al modelo
         model.addAttribute("tipoCuota", tipoCuota);
         model.addAttribute("cuotaSeleccionada", cuotaSeleccionada);
         model.addAttribute("equipoLocal", equipoLocal);
         model.addAttribute("equipoVisitante", equipoVisitante);
         model.addAttribute("liga", liga);
-        return "resumenApuesta"; // Vista del resumen de apuesta
+        model.addAttribute("usuario", nombreUsuario);
+        return "resumenApuesta";
     }
+
 
     @PostMapping("/confirmarApuesta")
     public String registrarApuesta(@RequestParam("tipoCuota") String tipoCuota,
@@ -47,12 +62,13 @@ public class ApuestaControlador {
                                    @RequestParam("equipoLocal") String equipoLocal,
                                    @RequestParam("equipoVisitante") String equipoVisitante,
                                    @RequestParam("liga") String liga,
+                                   @RequestParam("usuario") String nombreUsuario,
                                    Model model) {
-        // Simular saldo (para pruebas)
-        double saldo = 100000.00; // Cambiar esto para que sea dinámico (por ejemplo, obtenido de la base de datos)
+        // Obtener el saldo del usuario
+        double saldo = usuarioServicios.obtenerSaldo(nombreUsuario);
 
         if (saldo < montoApostado) {
-            // Si el saldo es insuficiente, se devuelve al resumen con un mensaje de error
+            // Saldo insuficiente
             model.addAttribute("error", "Saldo insuficiente para realizar la apuesta.");
             model.addAttribute("tipoCuota", tipoCuota);
             model.addAttribute("cuotaSeleccionada", cuotaSeleccionada);
@@ -60,8 +76,12 @@ public class ApuestaControlador {
             model.addAttribute("equipoVisitante", equipoVisitante);
             model.addAttribute("liga", liga);
             model.addAttribute("saldo", saldo);
-            return "resumenApuesta"; // Vista del resumen con el error
+            model.addAttribute("usuario", nombreUsuario);
+            return "resumenApuesta";
         }
+
+        // Obtener el objeto Usuario a partir del nombre de usuario
+        Usuario usuario = usuarioServicios.obtenerUsuarioPorNombre(nombreUsuario);
 
         // Crear y guardar la apuesta
         Apuesta nuevaApuesta = new Apuesta();
@@ -71,19 +91,23 @@ public class ApuestaControlador {
         nuevaApuesta.setEquipoLocal(equipoLocal);
         nuevaApuesta.setEquipoVisitante(equipoVisitante);
         nuevaApuesta.setEstado("Pendiente");
+        nuevaApuesta.setUsuario(usuario); // Ahora asignamos el objeto Usuario
 
         apuestaServicio.registrarApuesta(nuevaApuesta);
 
-        // Descontar el saldo
-        saldo -= montoApostado;
-        model.addAttribute("saldo", saldo);
+        // Actualizar el saldo del usuario
+        double nuevoSaldo = saldo - montoApostado;
+        usuarioServicios.actualizarSaldo(nombreUsuario, nuevoSaldo);
 
         // Redirigir al historial de apuestas
-        return "redirect:/apuestas";
+        return "redirect:/apuestas?usuario=" + nombreUsuario;
     }
 
+
     @PostMapping("/cancelarApuesta")
-    public String cancelarApuesta(@RequestParam("idApuesta") Long idApuesta, Model model) {
+    public String cancelarApuesta(@RequestParam("idApuesta") Long idApuesta,
+                                  @RequestParam("usuario") String nombreUsuario,
+                                  RedirectAttributes redirectAttributes) {
         // Obtener la apuesta a cancelar
         Apuesta apuesta = apuestaServicio.obtenerPorId(idApuesta);
 
@@ -91,11 +115,13 @@ public class ApuestaControlador {
             // Cambiar el estado de la apuesta a "Cancelada"
             apuesta.setEstado("Cancelada");
             apuestaServicio.actualizarApuesta(apuesta);
-            model.addAttribute("mensaje", "Apuesta cancelada exitosamente.");
+            redirectAttributes.addFlashAttribute("mensaje", "Apuesta cancelada exitosamente.");
         } else {
-            model.addAttribute("error", "No se pudo cancelar la apuesta.");
+            redirectAttributes.addFlashAttribute("error", "No se pudo cancelar la apuesta.");
         }
 
-        return "redirect:/apuestas"; // Redirigir al historial de apuestas
+        // Redirigir al historial de apuestas con el parámetro usuario
+        return "redirect:/apuestas?usuario=" + nombreUsuario;
     }
+
 }

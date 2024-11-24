@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
@@ -29,4 +30,11 @@ public class Apuesta {
     private String equipoVisitante;
 
     private String estado; // Pendiente, Ganada, Perdida
+
+    // Añadir esta relación
+    @ManyToOne
+    @JoinColumn(name = "usu_usuario", nullable = false)
+    private Usuario usuario;
+
 }
+
