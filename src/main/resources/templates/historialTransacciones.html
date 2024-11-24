@@ -29,7 +29,7 @@
     <tbody>
     <tr th:each="transaccion : ${historialTransacciones}">
       <td th:text="${transaccion.idTransaccion}"></td>
-      <td th:text="${#dates.format(transaccion.fecha, 'dd/MM/yyyy HH:mm:ss')}"></td>
+      <td th:text="${#temporals.format(transaccion.fecha, 'dd/MM/yyyy HH:mm:ss')}"></td>
       <td th:text="${transaccion.monto}"></td>
       <td th:text="${transaccion.tipo}"></td>
       <td th:text="${transaccion.banco}"></td>
