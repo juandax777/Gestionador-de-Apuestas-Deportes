@@ -39,5 +39,9 @@ public class UsuarioServicios {
     public void actualizarSaldo(String nombreUsuario, double nuevoSaldo) {
         usuarioRepositorio.actualizarSaldo(nombreUsuario, nuevoSaldo);
     }
+    @Transactional
+    public void guardarUsuario(Usuario usuario) {
+        usuarioRepositorio.save(usuario);
+    }
 
 }

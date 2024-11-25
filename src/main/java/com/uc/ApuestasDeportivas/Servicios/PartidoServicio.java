@@ -1,11 +1,18 @@
 package com.uc.ApuestasDeportivas.Servicios;
 
+import com.uc.ApuestasDeportivas.Persistencia.Entidades.Apuesta;
 import com.uc.ApuestasDeportivas.Persistencia.Entidades.Equipo;
 import com.uc.ApuestasDeportivas.Persistencia.Entidades.Partido;
+import com.uc.ApuestasDeportivas.Persistencia.Entidades.Usuario;
 import com.uc.ApuestasDeportivas.Persistencia.Repositorios.EquipoRepositorio;
 import com.uc.ApuestasDeportivas.Persistencia.Repositorios.PartidoRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+
+import java.util.Random;
+
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -14,10 +21,16 @@ import java.util.stream.Collectors;
 public class PartidoServicio {
 
     @Autowired
+    private PartidoRepositorio partidoRepositorio;
+
+    @Autowired
     private EquipoRepositorio equipoRepositorio;
 
     @Autowired
-    private PartidoRepositorio partidoRepositorio;
+    private ApuestaServicio apuestaServicio;
+
+    @Autowired
+    private UsuarioServicios usuarioServicios;
 
 
     public List<List<Partido>> generarPartidosPorJornadas(String liga) {
@@ -101,5 +114,78 @@ public class PartidoServicio {
         Map<String, List<Partido>> partidosAgrupados = partidos.stream()
                 .collect(Collectors.groupingBy(Partido::getFecha)); // Agrupa por la "fecha" de la jornada
         return new ArrayList<>(partidosAgrupados.values());
+    }
+
+    @Transactional
+    public void actualizarResultadosYapuestas() {
+        List<Partido> partidos = partidoRepositorio.findAll();
+        Random random = new Random();
+
+        // Simular resultados de los partidos
+        for (Partido partido : partidos) {
+            int golesLocal = random.nextInt(11); // 0 a 10
+            int golesVisitante = random.nextInt(11); // 0 a 10
+            partido.setResultado(golesLocal + "-" + golesVisitante);
+            partidoRepositorio.save(partido);
+        }
+
+        // Actualizar apuestas
+        List<Apuesta> apuestas = apuestaServicio.listarTodas();
+
+        for (Apuesta apuesta : apuestas) {
+            if (apuesta.getEstado().equals("Pendiente")) {
+                Partido partido = buscarPartidoCorrespondiente(apuesta);
+
+                if (partido != null) {
+                    String[] resultado = partido.getResultado().split("-");
+                    int golesLocal = Integer.parseInt(resultado[0]);
+                    int golesVisitante = Integer.parseInt(resultado[1]);
+
+                    boolean gano = false;
+
+                    switch (apuesta.getTipoCuota()) {
+                        case "Local":
+                            if (golesLocal > golesVisitante) {
+                                gano = true;
+                            }
+                            break;
+                        case "Visitante":
+                            if (golesVisitante > golesLocal) {
+                                gano = true;
+                            }
+                            break;
+                        case "Empate":
+                            if (golesLocal == golesVisitante) {
+                                gano = true;
+                            }
+                            break;
+                    }
+
+                    if (gano) {
+                        apuesta.setEstado("Ganada");
+                        // Actualizar saldo del usuario
+                        Usuario usuario = apuesta.getUsuario();
+                        double ganancia = apuesta.getMontoApostado() * apuesta.getCuotaSeleccionada();
+                        double nuevoSaldo = usuario.getSaldo() + ganancia;
+                        usuario.setSaldo(nuevoSaldo);
+                        usuarioServicios.guardarUsuario(usuario);
+                    } else {
+                        apuesta.setEstado("Perdida");
+                    }
+
+                    // Actualizar el resultado en la apuesta
+                    apuesta.setResultado(partido.getResultado());
+
+                    // Actualizar la apuesta
+                    apuestaServicio.actualizarApuesta(apuesta);
+                }
+            }
+        }
+    }
+
+
+    private Partido buscarPartidoCorrespondiente(Apuesta apuesta) {
+        return partidoRepositorio.findByEquipoLocalNombreAndEquipoVisitanteNombre(
+                apuesta.getEquipoLocal(), apuesta.getEquipoVisitante());
     }
 }

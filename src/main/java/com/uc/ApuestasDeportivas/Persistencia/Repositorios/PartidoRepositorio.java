@@ -9,4 +9,7 @@ import java.util.List;
 @Repository
 public interface PartidoRepositorio extends JpaRepository<Partido, Long> {
     List<Partido> findByEquipoLocalLiga(String liga);
+
+    // Nuevo metodo
+    Partido findByEquipoLocalNombreAndEquipoVisitanteNombre(String equipoLocal, String equipoVisitante);
 }

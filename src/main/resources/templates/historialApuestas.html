@@ -17,6 +17,7 @@
         <thead>
         <tr>
             <th>Equipo Local</th>
+            <th>Marcador</th>
             <th>Equipo Visitante</th>
             <th>Tipo de Cuota</th>
             <th>Cuota</th>
@@ -28,17 +29,26 @@
         <tbody>
         <tr th:each="apuesta : ${apuestas}">
             <td th:text="${apuesta.equipoLocal}"></td>
+            <td th:text="${apuesta.resultado != null ? apuesta.resultado : 'Por jugar'}"></td>
             <td th:text="${apuesta.equipoVisitante}"></td>
             <td th:text="${apuesta.tipoCuota}"></td>
             <td th:text="${apuesta.cuotaSeleccionada}"></td>
             <td th:text="${apuesta.montoApostado}"></td>
-            <td th:text="${apuesta.estado}"></td>
             <td>
-                <form th:action="@{/cancelarApuesta}" method="post" th:if="${apuesta.estado == 'Pendiente'}">
-                    <input type="hidden" th:value="${apuesta.idApuesta}" name="idApuesta"/>
-                    <input type="hidden" th:value="${usuario}" name="usuario"/>
-                    <button type="submit" class="btn btn-danger">Cancelar</button>
-                </form>
+            <span th:text="${apuesta.estado}"
+                  th:classappend="${apuesta.estado == 'Ganada'} ? ' text-success' : (apuesta.estado == 'Perdida' ? ' text-danger' : '')"></span>
+            </td>
+            <td>
+                <div th:if="${apuesta.estado == 'Pendiente'}">
+                    <form th:action="@{/cancelarApuesta}" method="post">
+                        <input type="hidden" th:value="${apuesta.idApuesta}" name="idApuesta"/>
+                        <input type="hidden" th:value="${usuario}" name="usuario"/>
+                        <button type="submit" class="btn btn-sm btn-danger">Cancelar</button>
+                    </form>
+                </div>
+                <div th:if="${apuesta.estado != 'Pendiente'}">
+                    <!-- Espacio vacío para mantener la alineación -->
+                </div>
             </td>
         </tr>
         </tbody>

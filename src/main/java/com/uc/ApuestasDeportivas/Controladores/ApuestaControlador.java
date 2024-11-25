@@ -5,6 +5,7 @@ import com.uc.ApuestasDeportivas.Persistencia.Entidades.Usuario;
 import com.uc.ApuestasDeportivas.Servicios.ApuestaServicio;
 import com.uc.ApuestasDeportivas.Servicios.UsuarioServicios;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,8 +19,11 @@ import java.util.List;
 @Controller
 public class ApuestaControlador {
 
-    private final ApuestaServicio apuestaServicio;
-    private final UsuarioServicios usuarioServicios;
+    @Autowired
+    private ApuestaServicio apuestaServicio;
+
+    @Autowired
+    private UsuarioServicios usuarioServicios;
 
     @GetMapping("/apuestas")
     public String listarApuestas(@RequestParam("usuario") String nombreUsuario, Model model) {
@@ -29,8 +33,6 @@ public class ApuestaControlador {
         model.addAttribute("usuario", nombreUsuario);
         return "historialApuestas"; // Vista de historial de apuestas
     }
-
-
 
 
     @PostMapping("/resumenApuesta")
@@ -91,7 +93,8 @@ public class ApuestaControlador {
         nuevaApuesta.setEquipoLocal(equipoLocal);
         nuevaApuesta.setEquipoVisitante(equipoVisitante);
         nuevaApuesta.setEstado("Pendiente");
-        nuevaApuesta.setUsuario(usuario); // Ahora asignamos el objeto Usuario
+        nuevaApuesta.setResultado("Por jugar"); // Asegúrate de inicializar el campo 'resultado'
+        nuevaApuesta.setUsuario(usuario);
 
         apuestaServicio.registrarApuesta(nuevaApuesta);
 

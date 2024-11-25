@@ -36,5 +36,7 @@ public class Apuesta {
     @JoinColumn(name = "usu_usuario", nullable = false)
     private Usuario usuario;
 
+    private String resultado;
+
 }
 

@@ -1,21 +1,38 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>Index</title>
-  <meta charset="UTF-8">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Index</title>
+    <meta charset="UTF-8">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Estilos personalizados -->
+    <style>
+        .banner-image {
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
 <div class="container mt-5">
-  <h2 class="text-center">Bienvenido a Apuestas Deportivas</h2>
-  <p class="lead text-center">
-    Este es un sitio web de apuestas deportivas donde puedes registrarte, ver a otros usuarios y participar en diversas actividades de apuestas.
-  </p>
+    <h2 class="text-center">Bienvenido a Apuestas Deportivas</h2>
+    <p class="lead text-center">
+        Bienvenido a Apuestas Deportivas, tu plataforma en línea para vivir la emoción de apostar en tus eventos
+        deportivos favoritos. Regístrate, ingresa saldo y comienza a hacer tus apuestas en las mejores ligas de fútbol.
+        Gestiona tus apuestas, consulta tu historial y sigue de cerca los resultados para ver si eres el ganador.
+        ¡Sumérgete en la pasión del deporte y siente la adrenalina de las apuestas con nosotros! </p>
 
-  <!-- Botón para ir a la página de inicio de sesión -->
-  <div class="text-center">
-    <a th:href="@{/login}" class="btn btn-primary mt-3">Iniciar Sesión</a>
-  </div>
+    <!-- Imagen agregada vía URL -->
+    <div class="text-center">
+        <img src="https://caracoltv.brightspotcdn.com/dims4/default/78d0668/2147483647/strip/true/crop/1280x720+0+0/resize/800x450!/quality/75/?url=http%3A%2F%2Fcaracol-brightspot.s3.us-west-2.amazonaws.com%2F64%2F82%2F170a61f94d97b038b992bcba9ecf%2Fseleccion-colombia.jpg"
+             alt="Selección Colombia" class="banner-image">
+    </div>
+
+    <!-- Botón para ir a la página de inicio de sesión -->
+    <div class="text-center">
+        <a th:href="@{/login}" class="btn btn-primary mt-3">Iniciar Sesión</a>
+    </div>
 </div>
 </body>
 </html>

@@ -8,14 +8,26 @@
 <body>
 <div class="container mt-5">
     <h1>Bienvenido a la Gestión de Apuestas</h1>
+    <div th:if="${mensaje}" class="alert alert-success" role="alert">
+        <span th:text="${mensaje}"></span>
+    </div>
     <p>Saldo Actual: $<span th:text="${saldo}">0.0</span></p>
 
     <div class="list-group mt-3">
         <a th:href="@{/apuestas(usuario=${usuario})}" class="list-group-item list-group-item-action">Ver Apuestas</a>
-        <a th:href="@{/historialTransacciones(usuario=${usuario})}" class="list-group-item list-group-item-action">Ver Historial de Transacciones</a>
-        <a th:href="@{/eventos(usuario=${usuario})}" class="list-group-item list-group-item-action">Ver Eventos Deportivos</a>
-        <a th:href="@{/ingresoSaldo(usuario=${usuario})}" class="list-group-item list-group-item-action">Ingresar Saldo</a>
+        <a th:href="@{/historialTransacciones(usuario=${usuario})}" class="list-group-item list-group-item-action">Ver
+            Historial de Transacciones</a>
+        <a th:href="@{/eventos(usuario=${usuario})}" class="list-group-item list-group-item-action">Ver Eventos
+            Deportivos</a>
+        <a th:href="@{/ingresoSaldo(usuario=${usuario})}" class="list-group-item list-group-item-action">Ingresar
+            Saldo</a>
+        <a th:href="@{/actualizarPartidos(usuario=${usuario})}" class="btn btn-success mt-3">Actualizar Partidos</a>
     </div>
+</div>
+<!-- formato para poner una ulr de un gif -->
+<div class="text-center">
+    <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExdHZoamkyNGoyZGRyZWNqcGQxeDd3NTVvZnhranp6cHNwdTNseTRncSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/xT1XGx3mIWL2J6PMWc/giphy.webp"
+         alt="Gif de Apuestas" class="banner-image">
 </div>
 </body>
 </html>
