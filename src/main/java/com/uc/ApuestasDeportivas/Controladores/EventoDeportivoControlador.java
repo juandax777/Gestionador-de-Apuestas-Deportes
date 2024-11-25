@@ -2,6 +2,7 @@ package com.uc.ApuestasDeportivas.Controladores;
 
 import com.uc.ApuestasDeportivas.Persistencia.Entidades.EventoDeportivo;
 import com.uc.ApuestasDeportivas.Servicios.EventoDeportivoServicio;
+import com.uc.ApuestasDeportivas.Servicios.UsuarioServicios;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,12 +16,15 @@ public class EventoDeportivoControlador {
 
     @Autowired
     private EventoDeportivoServicio servicio;
+    @Autowired
+    private UsuarioServicios usuarioServicios;
 
-    private double saldo = 90000.0; // Saldo inicial fijo para pruebas
+    //private double saldo = 90000.0; // Saldo inicial fijo para pruebas
 
     // Mostrar ligas disponibles
     @GetMapping("/eventos")
     public String verLigas(@RequestParam("usuario") String nombreUsuario, Model model) {
+        double saldo = usuarioServicios.obtenerSaldo(nombreUsuario);
         List<String> ligas = servicio.obtenerLigas();
         model.addAttribute("ligas", ligas);
         model.addAttribute("saldo", saldo);
@@ -35,6 +39,7 @@ public class EventoDeportivoControlador {
                                     @RequestParam("usuario") String nombreUsuario,
                                     Model model) {
         List<EventoDeportivo> eventos = servicio.obtenerEventosPorLiga(liga);
+        double saldo = usuarioServicios.obtenerSaldo(nombreUsuario);
         model.addAttribute("liga", liga);
         model.addAttribute("eventos", eventos);
         model.addAttribute("saldo", saldo);
@@ -44,7 +49,7 @@ public class EventoDeportivoControlador {
 
 
     // Método para actualizar el saldo (simulación de una transacción)
-    public void actualizarSaldo(double monto) {
-        saldo += monto;
-    }
+//    //public void actualizarSaldo(double monto) {
+//        saldo += monto;
+//    }
 }
