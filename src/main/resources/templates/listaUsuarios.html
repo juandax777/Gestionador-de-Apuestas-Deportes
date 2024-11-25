@@ -18,7 +18,7 @@
         <tbody>
         <tr th:each="usuario : ${usuarios}">
             <td th:text="${usuario.usuario}"></td>
-            <td th:text="${#strings.substring(usuario.contrasena, 0, 3) + '****'}"></td>
+            <td th:text="${#strings.substring(usuario.contrasena, 0, 1) + '****'}"></td>
         </tr>
         </tbody>
     </table>

@@ -17,3 +17,4 @@ public interface UsuarioRepositorio extends JpaRepository<Usuario, String> {
     @Query("UPDATE Usuario u SET u.saldo = :saldo WHERE u.usuario = :usuario")
     void actualizarSaldo(String usuario, double saldo);
 }
+

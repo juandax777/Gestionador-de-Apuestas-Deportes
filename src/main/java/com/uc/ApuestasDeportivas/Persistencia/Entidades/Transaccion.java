@@ -20,17 +20,18 @@ public class Transaccion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idTransaccion;
 
-    private LocalDateTime fecha; // Fecha y hora de la transacción
+    private LocalDateTime fecha;
 
-    private double monto; // Monto de la transacción
+    private double monto;
 
-    private String tipo; // Puede ser "Ingreso", "Apuesta", "Cancelación", etc.
+    private String tipo;
 
-    private String banco; // Banco desde donde se realiza la transacción
+    private String banco;
 
-    private double saldo; // Saldo después de la transacción
+    private double saldo;
 
     @ManyToOne
-    @JoinColumn(name = "id_usuario", nullable = false)
-    private Usuario usuario; // Relación con el usuario
+    @JoinColumn(name = "usu_usuario", nullable = false)
+    private Usuario usuario;
 }
+
