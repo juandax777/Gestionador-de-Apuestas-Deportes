@@ -26,7 +26,10 @@ public class Partido {
     private Equipo equipoVisitante;
 
     private String fecha; // Fecha del partido
-    private String resultado; // Resultado (vacío por ahora)
+    private String resultado; // Formato: "golesLocal-golesVisitante"
 
-    private Double cuotaEmpate; // Nueva cuota para empate
+    private Double cuotaEmpate; // Cuota para empate
+
+    private Integer golesLocal; // Goles del equipo local
+    private Integer golesVisitante; // Goles del equipo visitante
 }

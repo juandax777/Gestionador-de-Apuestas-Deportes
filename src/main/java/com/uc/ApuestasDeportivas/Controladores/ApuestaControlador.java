@@ -1,8 +1,10 @@
 package com.uc.ApuestasDeportivas.Controladores;
 
 import com.uc.ApuestasDeportivas.Persistencia.Entidades.Apuesta;
+import com.uc.ApuestasDeportivas.Persistencia.Entidades.Partido;
 import com.uc.ApuestasDeportivas.Persistencia.Entidades.Usuario;
 import com.uc.ApuestasDeportivas.Servicios.ApuestaServicio;
+import com.uc.ApuestasDeportivas.Servicios.PartidoServicio;
 import com.uc.ApuestasDeportivas.Servicios.UsuarioServicios;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -20,6 +22,7 @@ public class ApuestaControlador {
 
     private final ApuestaServicio apuestaServicio;
     private final UsuarioServicios usuarioServicios;
+    private final PartidoServicio partidoServicio;
 
     @GetMapping("/apuestas")
     public String listarApuestas(@RequestParam("usuario") String nombreUsuario, Model model) {
@@ -29,9 +32,6 @@ public class ApuestaControlador {
         model.addAttribute("usuario", nombreUsuario);
         return "historialApuestas"; // Vista de historial de apuestas
     }
-
-
-
 
     @PostMapping("/resumenApuesta")
     public String mostrarResumen(@RequestParam("tipoCuota") String tipoCuota,
@@ -44,6 +44,7 @@ public class ApuestaControlador {
         // Obtener el saldo del usuario
         double saldo = usuarioServicios.obtenerSaldo(nombreUsuario);
         model.addAttribute("saldo", saldo);
+
         // Pasar los datos al modelo
         model.addAttribute("tipoCuota", tipoCuota);
         model.addAttribute("cuotaSeleccionada", cuotaSeleccionada);
@@ -53,7 +54,6 @@ public class ApuestaControlador {
         model.addAttribute("usuario", nombreUsuario);
         return "resumenApuesta";
     }
-
 
     @PostMapping("/confirmarApuesta")
     public String registrarApuesta(@RequestParam("tipoCuota") String tipoCuota,
@@ -80,10 +80,16 @@ public class ApuestaControlador {
             return "resumenApuesta";
         }
 
-        // Obtener el objeto Usuario a partir del nombre de usuario
-        Usuario usuario = usuarioServicios.obtenerUsuarioPorNombre(nombreUsuario);
+        // Obtener el partido asociado
+        Partido partido = partidoServicio.obtenerPartidoPorEquiposYLiga(equipoLocal, equipoVisitante, liga);
+
+        if (partido == null) {
+            model.addAttribute("error", "El partido seleccionado no existe.");
+            return "resumenApuesta";
+        }
 
         // Crear y guardar la apuesta
+        Usuario usuario = usuarioServicios.obtenerUsuarioPorNombre(nombreUsuario);
         Apuesta nuevaApuesta = new Apuesta();
         nuevaApuesta.setTipoCuota(tipoCuota);
         nuevaApuesta.setCuotaSeleccionada(cuotaSeleccionada);
@@ -91,7 +97,8 @@ public class ApuestaControlador {
         nuevaApuesta.setEquipoLocal(equipoLocal);
         nuevaApuesta.setEquipoVisitante(equipoVisitante);
         nuevaApuesta.setEstado("Pendiente");
-        nuevaApuesta.setUsuario(usuario); // Ahora asignamos el objeto Usuario
+        nuevaApuesta.setUsuario(usuario);
+        nuevaApuesta.setPartido(partido); // Asignar el partido asociado
 
         apuestaServicio.registrarApuesta(nuevaApuesta);
 
@@ -102,7 +109,6 @@ public class ApuestaControlador {
         // Redirigir al historial de apuestas
         return "redirect:/apuestas?usuario=" + nombreUsuario;
     }
-
 
     @PostMapping("/cancelarApuesta")
     public String cancelarApuesta(@RequestParam("idApuesta") Long idApuesta,
@@ -115,13 +121,35 @@ public class ApuestaControlador {
             // Cambiar el estado de la apuesta a "Cancelada"
             apuesta.setEstado("Cancelada");
             apuestaServicio.actualizarApuesta(apuesta);
-            redirectAttributes.addFlashAttribute("mensaje", "Apuesta cancelada exitosamente.");
+
+            // Devolver el monto al saldo del usuario
+            usuarioServicios.actualizarSaldo(nombreUsuario,
+                    usuarioServicios.obtenerSaldo(nombreUsuario) + apuesta.getMontoApostado());
+
+            redirectAttributes.addFlashAttribute("mensaje", "Apuesta cancelada y monto devuelto exitosamente.");
         } else {
             redirectAttributes.addFlashAttribute("error", "No se pudo cancelar la apuesta.");
         }
 
-        // Redirigir al historial de apuestas con el parámetro usuario
         return "redirect:/apuestas?usuario=" + nombreUsuario;
     }
 
+    @PostMapping("/verResultado")
+    public String verResultado(@RequestParam("idApuesta") Long idApuesta,
+                               RedirectAttributes redirectAttributes) {
+        Apuesta apuesta = apuestaServicio.obtenerPorId(idApuesta);
+
+        if (apuesta != null) {
+            // Evalúa la apuesta y actualiza el resultado
+            apuestaServicio.evaluarResultado(apuesta);
+
+            // Añade un mensaje de éxito
+            redirectAttributes.addFlashAttribute("mensaje", "Resultado evaluado correctamente. Estado actualizado.");
+        } else {
+            // Manejo de error si no se encuentra la apuesta
+            redirectAttributes.addFlashAttribute("error", "No se pudo evaluar el resultado.");
+        }
+
+        return "redirect:/apuestas?usuario=" + apuesta.getUsuario().getUsuario();
+    }
 }

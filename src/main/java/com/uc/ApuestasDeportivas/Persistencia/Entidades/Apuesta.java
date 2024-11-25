@@ -36,5 +36,11 @@ public class Apuesta {
     @JoinColumn(name = "usu_usuario", nullable = false)
     private Usuario usuario;
 
+    @ManyToOne
+    @JoinColumn(name = "partido_id", nullable = false)
+    private Partido partido;
+
+    private Double ganancia; // Ganancia potencial
+
 }
 

@@ -19,7 +19,6 @@ public class PartidoServicio {
     @Autowired
     private PartidoRepositorio partidoRepositorio;
 
-
     public List<List<Partido>> generarPartidosPorJornadas(String liga) {
         // Verificar si ya existen partidos para esta liga
         List<Partido> partidosExistentes = partidoRepositorio.findByEquipoLocalLiga(liga);
@@ -75,11 +74,25 @@ public class PartidoServicio {
                 if (!enfrentamientosPrevios.contains(enfrentamiento) && !enfrentamientosPrevios.contains(enfrentamientoInverso)) {
                     enfrentamientosPrevios.add(enfrentamiento);
 
+                    // Generar cuotas aleatorias
                     local.setCuota(Math.round((1.00 + (5.20 - 1.00) * random.nextDouble()) * 100.0) / 100.0);
                     visitante.setCuota(Math.round((1.00 + (5.20 - 1.00) * random.nextDouble()) * 100.0) / 100.0);
                     Double cuotaEmpate = Math.round((1.50 + (3.50 - 1.50) * random.nextDouble()) * 100.0) / 100.0;
 
-                    Partido partido = new Partido(null, local, visitante, fechaJornada, "", cuotaEmpate);
+                    // Generar resultados aleatorios
+                    int golesLocal = random.nextInt(10); // Goles aleatorios entre 0 y 9
+                    int golesVisitante = random.nextInt(10);
+
+                    Partido partido = new Partido(
+                            null,
+                            local,
+                            visitante,
+                            fechaJornada,
+                            golesLocal + "-" + golesVisitante, // Formato de resultado
+                            cuotaEmpate,
+                            golesLocal,
+                            golesVisitante
+                    );
                     jornadaActual.add(partido);
                 }
             }
@@ -96,10 +109,18 @@ public class PartidoServicio {
         return todasLasJornadas;
     }
 
-
     private List<List<Partido>> agruparPorJornadas(List<Partido> partidos) {
         Map<String, List<Partido>> partidosAgrupados = partidos.stream()
                 .collect(Collectors.groupingBy(Partido::getFecha)); // Agrupa por la "fecha" de la jornada
         return new ArrayList<>(partidosAgrupados.values());
+    }
+
+    public Partido obtenerPartidoPorId(Long id) {
+        return partidoRepositorio.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Partido no encontrado: " + id));
+    }
+    public Partido obtenerPartidoPorEquiposYLiga(String equipoLocal, String equipoVisitante, String liga) {
+        return partidoRepositorio.findByEquipoLocalNombreAndEquipoVisitanteNombreAndEquipoLocalLiga(equipoLocal, equipoVisitante, liga)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró un partido con los equipos y la liga especificados."));
     }
 }
